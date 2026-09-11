@@ -1,12 +1,16 @@
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Login } from "./pages/Login";
+
 export default function App() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white p-8 rounded-xl shadow-lg text-center">
-        <h1 className="text-3xl font-bold text-indigo-600 mb-4">
-          Plataforma de Estudos
-        </h1>
-        <p className="text-gray-600">Bora estudar! 🚀</p>
-      </div>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Rota da tela de Login */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Se acessar qualquer outra rota (por enquanto), joga pro login */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
