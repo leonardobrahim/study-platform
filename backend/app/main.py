@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import auth, semesters, subjects, topics
+from app.api import auth, semesters, subjects, topics, tasks
 
 app = FastAPI(
     title="Plataforma de Estudos API",
@@ -20,6 +20,7 @@ app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
 app.include_router(semesters.router, prefix="/api/semesters", tags=["Semestres"])
 app.include_router(subjects.router, prefix="/api/subjects", tags=["Disciplinas"])
 app.include_router(topics.router, prefix="/api/topics", tags=["Conteúdos"])
+app.include_router(tasks.router, prefix="/api/tasks", tags=["Tarefas"])
 
 @app.get("/")
 def root():
