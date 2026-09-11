@@ -3,6 +3,7 @@ import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
 import { Layout } from "./components/Layout";
 import { Subjects } from "./pages/Subjects";
+import { Tasks } from "./pages/Tasks";
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/subjects" element={<Subjects />} />
+          <Route path="/tasks" element={<Tasks />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
