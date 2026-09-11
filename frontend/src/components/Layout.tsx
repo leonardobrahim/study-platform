@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
+  Calendar,
   BookOpen,
   CheckSquare,
   Timer,
@@ -26,6 +27,7 @@ export function Layout() {
 
   const navItems = [
     { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { to: "/semesters", icon: Calendar, label: "Semestres" },
     { to: "/subjects", icon: BookOpen, label: "Disciplinas" },
     { to: "/tasks", icon: CheckSquare, label: "Tarefas" },
     { to: "/timer", icon: Timer, label: "Timer" },

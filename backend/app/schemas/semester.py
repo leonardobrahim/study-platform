@@ -14,6 +14,13 @@ class SemesterBase(BaseModel):
 class SemesterCreate(SemesterBase):
     pass
 
+# O que o usuário envia para atualizar (todos os campos opcionais)
+class SemesterUpdate(BaseModel):
+    name: Optional[str] = None
+    year: Optional[int] = None
+    period: Optional[int] = None
+    status: Optional[str] = None
+
 # O que a API devolve
 class SemesterResponse(SemesterBase):
     id: UUID
