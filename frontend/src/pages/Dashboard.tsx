@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../services/api";
 import type { DashboardData } from "../types/dashboard";
-import { Clock, CheckSquare, BookOpen, LogOut } from "lucide-react";
+import { Clock, CheckSquare, BookOpen } from "lucide-react";
 
 export function Dashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -51,10 +51,6 @@ export function Dashboard() {
           <h1 className="text-2xl font-bold text-gray-900">Meu Painel</h1>
           <p className="text-gray-500">Resumo das suas atividades de estudo.</p>
         </div>
-        <button className="flex items-center gap-2 text-gray-500 hover:text-red-600 transition-colors">
-          <LogOut size={20} />
-          Sair
-        </button>
       </div>
 
       {/* Cards Superiores (Resumo) */}
