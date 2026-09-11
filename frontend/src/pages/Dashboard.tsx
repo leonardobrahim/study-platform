@@ -26,11 +26,6 @@ export function Dashboard() {
     fetchDashboard();
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("@StudyPlatform:token");
-    navigate("/login");
-  };
-
   // Função simples para formatar os segundos em Horas e Minutos
   const formatTime = (totalSeconds: number) => {
     const hours = Math.floor(totalSeconds / 3600);
@@ -49,95 +44,86 @@ export function Dashboard() {
   if (!data) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-5xl mx-auto space-y-8">
-        {/* Cabeçalho */}
-        <div className="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+    <div className="max-w-5xl mx-auto space-y-8">
+      {/* Cabeçalho */}
+      <div className="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Meu Painel</h1>
+          <p className="text-gray-500">Resumo das suas atividades de estudo.</p>
+        </div>
+        <button className="flex items-center gap-2 text-gray-500 hover:text-red-600 transition-colors">
+          <LogOut size={20} />
+          Sair
+        </button>
+      </div>
+
+      {/* Cards Superiores (Resumo) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+          <div className="bg-indigo-100 p-4 rounded-lg">
+            <Clock className="w-8 h-8 text-indigo-600" />
+          </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Meu Painel</h1>
-            <p className="text-gray-500">
-              Resumo das suas atividades de estudo.
+            <p className="text-sm text-gray-500 font-medium">
+              Tempo Total Estudado
             </p>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-gray-500 hover:text-red-600 transition-colors"
-          >
-            <LogOut size={20} />
-            Sair
-          </button>
-        </div>
-
-        {/* Cards Superiores (Resumo) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div className="bg-indigo-100 p-4 rounded-lg">
-              <Clock className="w-8 h-8 text-indigo-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 font-medium">
-                Tempo Total Estudado
-              </p>
-              <h2 className="text-3xl font-bold text-gray-900">
-                {formatTime(data.total_time_studied_seconds)}
-              </h2>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div className="bg-green-100 p-4 rounded-lg">
-              <CheckSquare className="w-8 h-8 text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500 font-medium">
-                Tarefas Pendentes
-              </p>
-              <h2 className="text-3xl font-bold text-gray-900">
-                {data.pending_tasks_count}
-              </h2>
-            </div>
+            <h2 className="text-3xl font-bold text-gray-900">
+              {formatTime(data.total_time_studied_seconds)}
+            </h2>
           </div>
         </div>
 
-        {/* Progresso das Disciplinas */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-6">
-            <BookOpen className="text-indigo-600" />
-            <h3 className="text-lg font-bold text-gray-900">
-              Progresso por Disciplina
-            </h3>
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+          <div className="bg-green-100 p-4 rounded-lg">
+            <CheckSquare className="w-8 h-8 text-green-600" />
           </div>
-
-          {data.subjects_progress.length === 0 ? (
-            <p className="text-gray-500">
-              Nenhuma disciplina cadastrada ainda.
+          <div>
+            <p className="text-sm text-gray-500 font-medium">
+              Tarefas Pendentes
             </p>
-          ) : (
-            <div className="space-y-4">
-              {data.subjects_progress.map((subject) => (
-                <div key={subject.subject_id} className="space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span className="font-medium text-gray-700">
-                      {subject.name}
-                    </span>
-                    <span className="text-gray-500">
-                      {subject.progress_percentage}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div
-                      className="bg-indigo-600 h-2.5 rounded-full transition-all duration-500"
-                      style={{
-                        width: `${subject.progress_percentage}%`,
-                        backgroundColor: subject.color || "#4f46e5",
-                      }}
-                    ></div>
-                  </div>
+            <h2 className="text-3xl font-bold text-gray-900">
+              {data.pending_tasks_count}
+            </h2>
+          </div>
+        </div>
+      </div>
+
+      {/* Progresso das Disciplinas */}
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div className="flex items-center gap-2 mb-6">
+          <BookOpen className="text-indigo-600" />
+          <h3 className="text-lg font-bold text-gray-900">
+            Progresso por Disciplina
+          </h3>
+        </div>
+
+        {data.subjects_progress.length === 0 ? (
+          <p className="text-gray-500">Nenhuma disciplina cadastrada ainda.</p>
+        ) : (
+          <div className="space-y-4">
+            {data.subjects_progress.map((subject) => (
+              <div key={subject.subject_id} className="space-y-1">
+                <div className="flex justify-between text-sm">
+                  <span className="font-medium text-gray-700">
+                    {subject.name}
+                  </span>
+                  <span className="text-gray-500">
+                    {subject.progress_percentage}%
+                  </span>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    className="bg-indigo-600 h-2.5 rounded-full transition-all duration-500"
+                    style={{
+                      width: `${subject.progress_percentage}%`,
+                      backgroundColor: subject.color || "#4f46e5",
+                    }}
+                  ></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
