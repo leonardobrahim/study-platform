@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* Fundo levemente acinzentado para o sistema ficar agradável */
+body {
+  @apply bg-gray-50 text-gray-900;
+}
