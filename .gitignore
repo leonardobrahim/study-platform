@@ -1,0 +1,21 @@
+# Ambientes Virtuais
+venv/
+env/
+.venv/
+
+# Variáveis de Ambiente (NUNCA SUBIR PARA O GITHUB)
+.env
+
+# Cache do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Pastas de IDE
+.vscode/
+.idea/
+
+# Banco de dados local (se usar SQLite futuramente)
+*.sqlite3
+*.db
