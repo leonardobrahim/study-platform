@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { api } from "../services/api";
 import { BookOpen } from "lucide-react"; // Ícone de livro da biblioteca Lucide
+import { useNavigate } from "react-router-dom";
 
 export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault(); // Evita que a página recarregue ao enviar o formulário
@@ -24,7 +26,8 @@ export function Login() {
       // Salva o token no navegador (localStorage)
       localStorage.setItem("@StudyPlatform:token", response.data.access_token);
 
-      alert("Login realizado com sucesso! Em breve iremos para o Dashboard.");
+      // Redireciona para o dashboard após o login
+      navigate("/dashboard");
     } catch (err) {
       setError("E-mail ou senha incorretos.");
     } finally {

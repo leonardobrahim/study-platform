@@ -1,15 +1,15 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Login } from "./pages/Login";
+import { Dashboard } from "./pages/Dashboard";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rota da tela de Login */}
         <Route path="/login" element={<Login />} />
-
-        {/* Se acessar qualquer outra rota (por enquanto), joga pro login */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />{" "}
+        {/* Se acessar o nada, tenta ir pro dashboard */}
       </Routes>
     </BrowserRouter>
   );
