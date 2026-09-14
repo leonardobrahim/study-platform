@@ -16,6 +16,15 @@ class SubjectBase(BaseModel):
 class SubjectCreate(SubjectBase):
     pass
 
+# Dados para atualização (todos opcionais)
+class SubjectUpdate(BaseModel):
+    name: Optional[str] = None
+    semester_id: Optional[UUID] = None
+    code: Optional[str] = None
+    professor: Optional[str] = None
+    description: Optional[str] = None
+    color: Optional[str] = None
+
 # Dados que a API devolve
 class SubjectResponse(SubjectBase):
     id: UUID
