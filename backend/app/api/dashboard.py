@@ -62,6 +62,9 @@ def get_dashboard_summary(
         Semester.status == "ACTIVE"
     ).all()
 
+    total_topics_overall = 0
+    completed_topics_overall = 0
+
     for subject in active_subjects:
         total_topics = db.query(Topic).filter(Topic.subject_id == subject.id).count()
         completed_topics = db.query(Topic).filter(
@@ -73,6 +76,9 @@ def get_dashboard_summary(
         if total_topics > 0:
             progress = round((completed_topics / total_topics) * 100, 2)
 
+        total_topics_overall += total_topics
+        completed_topics_overall += completed_topics
+
         subjects_progress.append(
             SubjectProgress(
                 subject_id=subject.id,
@@ -82,9 +88,15 @@ def get_dashboard_summary(
             )
         )
 
+    # 6. Progresso Geral (RF24): agregado sobre todos os conteúdos das disciplinas ativas
+    overall_progress = 0.0
+    if total_topics_overall > 0:
+        overall_progress = round((completed_topics_overall / total_topics_overall) * 100, 2)
+
     return DashboardResponse(
         total_time_studied_seconds=int(total_time),
         pending_tasks_count=pending_tasks,
+        overall_progress_percentage=overall_progress,
         subjects_progress=subjects_progress,
         next_tasks=next_tasks,
         recent_sessions=recent_sessions

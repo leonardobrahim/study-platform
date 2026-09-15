@@ -23,6 +23,7 @@ class SessionSummary(BaseModel):
 class DashboardResponse(BaseModel):
     total_time_studied_seconds: int
     pending_tasks_count: int
+    overall_progress_percentage: float
     subjects_progress: List[SubjectProgress]
     next_tasks: List[TaskSummary]
     recent_sessions: List[SessionSummary]

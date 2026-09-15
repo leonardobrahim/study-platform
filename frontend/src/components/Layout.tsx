@@ -5,6 +5,7 @@ import {
   BookOpen,
   CheckSquare,
   Timer,
+  History,
   LogOut,
 } from "lucide-react";
 import { useEffect } from "react";
@@ -31,6 +32,7 @@ export function Layout() {
     { to: "/subjects", icon: BookOpen, label: "Disciplinas" },
     { to: "/tasks", icon: CheckSquare, label: "Tarefas" },
     { to: "/timer", icon: Timer, label: "Timer" },
+    { to: "/sessions", icon: History, label: "Histórico" },
   ];
 
   return (

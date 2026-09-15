@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../services/api";
 import type { DashboardData } from "../types/dashboard";
-import { Clock, CheckSquare, BookOpen } from "lucide-react";
+import { Clock, CheckSquare, BookOpen, TrendingUp, LogOut } from "lucide-react";
 
 export function Dashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -16,7 +16,6 @@ export function Dashboard() {
         setData(response.data);
       } catch (error) {
         console.error("Erro ao carregar dashboard", error);
-        // Se o token expirou ou deu erro, manda de volta pro login
         localStorage.removeItem("@StudyPlatform:token");
         navigate("/login");
       } finally {
@@ -26,7 +25,6 @@ export function Dashboard() {
     fetchDashboard();
   }, [navigate]);
 
-  // Função simples para formatar os segundos em Horas e Minutos
   const formatTime = (totalSeconds: number) => {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -45,16 +43,18 @@ export function Dashboard() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
-      {/* Cabeçalho */}
       <div className="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Meu Painel</h1>
           <p className="text-gray-500">Resumo das suas atividades de estudo.</p>
         </div>
+        <button className="flex items-center gap-2 text-gray-500 hover:text-red-600 transition-colors">
+          <LogOut size={20} />
+          Sair
+        </button>
       </div>
 
-      {/* Cards Superiores (Resumo) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
           <div className="bg-indigo-100 p-4 rounded-lg">
             <Clock className="w-8 h-8 text-indigo-600" />
@@ -82,9 +82,20 @@ export function Dashboard() {
             </h2>
           </div>
         </div>
+
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+          <div className="bg-purple-100 p-4 rounded-lg">
+            <TrendingUp className="w-8 h-8 text-purple-600" />
+          </div>
+          <div>
+            <p className="text-sm text-gray-500 font-medium">Progresso Geral</p>
+            <h2 className="text-3xl font-bold text-gray-900">
+              {data.overall_progress_percentage}%
+            </h2>
+          </div>
+        </div>
       </div>
 
-      {/* Progresso das Disciplinas */}
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
         <div className="flex items-center gap-2 mb-6">
           <BookOpen className="text-indigo-600" />
