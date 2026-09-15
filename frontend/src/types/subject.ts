@@ -1,9 +1,11 @@
 export interface Subject {
   id: string;
   name: string;
-  color: string | null;
+  semester_id: string;
   code: string | null;
   professor: string | null;
+  description: string | null;
+  color: string | null;
 }
 
 export interface Topic {

@@ -7,6 +7,7 @@ import { Semesters } from "./pages/Semesters";
 import { Subjects } from "./pages/Subjects";
 import { Tasks } from "./pages/Tasks";
 import { Timer } from "./pages/Timer";
+import { Sessions } from "./pages/Sessions";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/subjects" element={<Subjects />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/timer" element={<Timer />} />
+          <Route path="/sessions" element={<Sessions />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

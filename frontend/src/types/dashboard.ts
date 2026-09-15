@@ -21,6 +21,7 @@ export interface SessionSummary {
 export interface DashboardData {
   total_time_studied_seconds: number;
   pending_tasks_count: number;
+  overall_progress_percentage: number;
   subjects_progress: SubjectProgress[];
   next_tasks: TaskSummary[];
   recent_sessions: SessionSummary[];

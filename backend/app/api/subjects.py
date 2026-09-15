@@ -6,7 +6,7 @@ from uuid import UUID
 from app.core.database import get_db
 from app.models.subject import Subject
 from app.models.semester import Semester
-from app.schemas.subject import SubjectCreate, SubjectResponse
+from app.schemas.subject import SubjectCreate, SubjectUpdate, SubjectResponse
 from app.api.deps import get_current_user
 from app.models.user import User
 
@@ -18,7 +18,6 @@ def create_subject(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    # Regra de Segurança: Verifica se o semestre existe e PERTENCE ao usuário logado
     semester = db.query(Semester).filter(
         Semester.id == subject.semester_id, 
         Semester.user_id == current_user.id
@@ -45,15 +44,50 @@ def create_subject(
 
 @router.get("/", response_model=List[SubjectResponse])
 def get_subjects(
-    semester_id: Optional[UUID] = None, # Parâmetro opcional para filtrar por semestre
+    semester_id: Optional[UUID] = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    # Inicia a busca cruzando Disciplina e Semestre
     query = db.query(Subject).join(Semester).filter(Semester.user_id == current_user.id)
     
-    # Se o usuário passar um semester_id na URL, filtramos os resultados
     if semester_id:
         query = query.filter(Subject.semester_id == semester_id)
         
     return query.all()
+
+@router.patch("/{subject_id}", response_model=SubjectResponse)
+def update_subject(
+    subject_id: UUID,
+    subject_update: SubjectUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    # Garante que a disciplina existe e pertence ao usuário logado
+    subject = db.query(Subject).join(Semester).filter(
+        Subject.id == subject_id,
+        Semester.user_id == current_user.id
+    ).first()
+
+    if not subject:
+        raise HTTPException(status_code=404, detail="Disciplina não encontrada.")
+
+    update_data = subject_update.model_dump(exclude_unset=True)
+
+    # Se está tentando mover a disciplina de semestre, valida que o destino também é do usuário
+    if "semester_id" in update_data:
+        target_semester = db.query(Semester).filter(
+            Semester.id == update_data["semester_id"],
+            Semester.user_id == current_user.id
+        ).first()
+        if not target_semester:
+            raise HTTPException(
+                status_code=404,
+                detail="Semestre de destino não encontrado ou não pertence a este usuário."
+            )
+
+    for key, value in update_data.items():
+        setattr(subject, key, value)
+
+    db.commit()
+    db.refresh(subject)
+    return subject
