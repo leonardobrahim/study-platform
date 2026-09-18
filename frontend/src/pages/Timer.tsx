@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { api } from "../services/api";
 import type { Subject } from "../types/subject";
-import { Play, Pause, Square, BookOpen, Clock } from "lucide-react";
+import { Play, Pause, Square, BookOpen, Clock, PlusCircle, X, Calendar } from "lucide-react";
 
 export function Timer() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -11,6 +11,14 @@ export function Timer() {
   const [time, setTime] = useState(0); // Tempo em segundos
   const [isRunning, setIsRunning] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null); // Guarda o ID do backend
+
+  // Estados do Registro Manual
+  const [showManualModal, setShowManualModal] = useState(false);
+  const [manualSubjectId, setManualSubjectId] = useState("");
+  const [manualMinutes, setManualMinutes] = useState(60);
+  const [manualDate, setManualDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [manualNotes, setManualNotes] = useState("");
+  const [isSavingManual, setIsSavingManual] = useState(false);
 
   useEffect(() => {
     async function fetchSubjects() {
@@ -121,6 +129,38 @@ export function Timer() {
     }
   };
 
+  const handleSaveManual = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualSubjectId) {
+      alert("Por favor, selecione uma disciplina.");
+      return;
+    }
+    if (!manualMinutes || manualMinutes <= 0) {
+      alert("A duração deve ser maior que zero minutos.");
+      return;
+    }
+
+    try {
+      setIsSavingManual(true);
+      await api.post("/sessions/manual", {
+        subject_id: manualSubjectId,
+        duration_minutes: Number(manualMinutes),
+        session_date: manualDate ? new Date(`${manualDate}T12:00:00Z`).toISOString() : null,
+        notes: manualNotes || null
+      });
+
+      alert("🎉 Sessão registrada manualmente com sucesso! Vá ao Dashboard para conferir as estatísticas.");
+      setShowManualModal(false);
+      setManualNotes("");
+      setManualMinutes(60);
+    } catch (error: any) {
+      console.error("Erro ao registrar sessão manual", error);
+      alert(error.response?.data?.detail || "Erro ao registrar sessão manual.");
+    } finally {
+      setIsSavingManual(false);
+    }
+  };
+
   const formatTime = (totalSeconds: number) => {
     const h = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
     const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
@@ -137,8 +177,17 @@ export function Timer() {
             Concentre-se, acompanhe seu tempo e evolua.
           </p>
         </div>
-        <div className="bg-indigo-100 p-3 rounded-full text-indigo-600">
-          <Clock size={28} />
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowManualModal(true)}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors cursor-pointer border border-indigo-100"
+          >
+            <PlusCircle size={18} />
+            Registrar Manualmente
+          </button>
+          <div className="bg-indigo-100 p-3 rounded-full text-indigo-600">
+            <Clock size={24} />
+          </div>
         </div>
       </div>
 
@@ -196,6 +245,122 @@ export function Timer() {
           )}
         </div>
       </div>
+
+      {/* Modal de Registro Manual */}
+      {showManualModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-gray-100 space-y-5">
+            <div className="flex justify-between items-center pb-3 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <Clock className="text-indigo-600" size={22} />
+                <h3 className="text-lg font-bold text-gray-900">Registrar Sessão Manual</h3>
+              </div>
+              <button
+                onClick={() => setShowManualModal(false)}
+                className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveManual} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Disciplina *
+                </label>
+                <select
+                  value={manualSubjectId}
+                  onChange={(e) => setManualSubjectId(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm"
+                >
+                  <option value="">Selecione uma disciplina...</option>
+                  {subjects.map((subject) => (
+                    <option key={subject.id} value={subject.id}>
+                      {subject.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Duração (minutos) *
+                </label>
+                <div className="flex gap-2 mb-2">
+                  {[25, 45, 60, 90].map((mins) => (
+                    <button
+                      key={mins}
+                      type="button"
+                      onClick={() => setManualMinutes(mins)}
+                      className={`flex-1 py-1.5 text-xs font-semibold rounded-md border transition-all ${
+                        manualMinutes === mins
+                          ? "bg-indigo-50 border-indigo-500 text-indigo-700"
+                          : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                      }`}
+                    >
+                      {mins}m
+                    </button>
+                  ))}
+                </div>
+                <input
+                  type="number"
+                  min="1"
+                  max="1440"
+                  value={manualMinutes}
+                  onChange={(e) => setManualMinutes(Number(e.target.value))}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm"
+                  placeholder="Ex: 60"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1.5">
+                  <Calendar size={14} className="text-gray-400" />
+                  Data da Sessão
+                </label>
+                <input
+                  type="date"
+                  value={manualDate}
+                  onChange={(e) => setManualDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Anotações (opcional)
+                </label>
+                <textarea
+                  value={manualNotes}
+                  onChange={(e) => setManualNotes(e.target.value)}
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm resize-none"
+                  placeholder="Ex: Resolução de exercícios do capítulo 3..."
+                />
+              </div>
+
+              <div className="flex gap-3 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowManualModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 font-medium text-sm transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingManual}
+                  className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium text-sm transition-colors disabled:opacity-50"
+                >
+                  {isSavingManual ? "Salvando..." : "Salvar Sessão"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

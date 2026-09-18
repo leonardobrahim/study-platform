@@ -13,6 +13,14 @@ class StudySessionFinish(BaseModel):
     duration: int # em segundos
     notes: Optional[str] = None
 
+# Dados para registro MANUAL de sessão (estudo retroativo ou rápido)
+class StudySessionManual(BaseModel):
+    subject_id: UUID
+    topic_id: Optional[UUID] = None
+    duration_minutes: int
+    session_date: Optional[datetime] = None
+    notes: Optional[str] = None
+
 # O que a API devolve
 class StudySessionResponse(BaseModel):
     id: UUID

@@ -2,13 +2,15 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from uuid import UUID
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from app.core.database import get_db
 from app.models.study_session import StudySession
 from app.models.subject import Subject
 from app.models.semester import Semester
-from app.schemas.study_session import StudySessionStart, StudySessionFinish, StudySessionResponse
+from app.schemas.study_session import (
+    StudySessionStart, StudySessionFinish, StudySessionResponse, StudySessionManual
+)
 from app.api.deps import get_current_user
 from app.models.user import User
 
@@ -92,3 +94,35 @@ def get_sessions(
         query = query.filter(StudySession.end_time.is_(None))
         
     return query.order_by(StudySession.start_time.desc()).all()
+
+@router.post("/manual", response_model=StudySessionResponse, status_code=status.HTTP_201_CREATED)
+def create_manual_session(
+    session_data: StudySessionManual,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    # Verifica se a disciplina existe e pertence ao usuário
+    subject = db.query(Subject).join(Semester).filter(
+        Subject.id == session_data.subject_id,
+        Semester.user_id == current_user.id
+    ).first()
+    if not subject:
+        raise HTTPException(status_code=404, detail="Disciplina não encontrada.")
+
+    start_time = session_data.session_date or datetime.now(timezone.utc)
+    duration_seconds = session_data.duration_minutes * 60
+    end_time = start_time + timedelta(seconds=duration_seconds)
+
+    new_session = StudySession(
+        user_id=current_user.id,
+        subject_id=session_data.subject_id,
+        topic_id=session_data.topic_id,
+        start_time=start_time,
+        end_time=end_time,
+        duration=duration_seconds,
+        notes=session_data.notes
+    )
+    db.add(new_session)
+    db.commit()
+    db.refresh(new_session)
+    return new_session
