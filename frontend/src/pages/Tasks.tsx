@@ -9,6 +9,7 @@ import {
   AlertCircle,
   Plus,
   Pencil,
+  Trash2,
   X,
 } from "lucide-react";
 
@@ -101,6 +102,18 @@ export function Tasks() {
       );
     }
   };
+
+  async function handleDeleteTask(taskId: string) {
+    if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
+    
+    try {
+      await api.delete(`/tasks/${taskId}`);
+      setTasks((prev) => prev.filter((t) => t.id !== taskId));
+    } catch (error) {
+      console.error("Erro ao excluir tarefa", error);
+      alert("Não foi possível excluir a tarefa.");
+    }
+  }
 
   function openCreateModal() {
     setEditingId(null);
@@ -208,6 +221,127 @@ export function Tasks() {
       <div className="text-indigo-600 font-bold">Carregando tarefas...</div>
     );
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const overdueTasks = tasks.filter((t) => {
+    if (t.status === "COMPLETED" || !t.due_date) return false;
+    const dueDate = new Date(t.due_date);
+    dueDate.setHours(0, 0, 0, 0);
+    return dueDate < today;
+  });
+
+  const todayTasks = tasks.filter((t) => {
+    if (t.status === "COMPLETED" || !t.due_date) return false;
+    const dueDate = new Date(t.due_date);
+    dueDate.setHours(0, 0, 0, 0);
+    return dueDate.getTime() === today.getTime();
+  });
+
+  const upcomingTasks = tasks.filter((t) => {
+    if (t.status === "COMPLETED") return false;
+    if (!t.due_date) return true;
+    const dueDate = new Date(t.due_date);
+    dueDate.setHours(0, 0, 0, 0);
+    return dueDate > today;
+  });
+
+  const completedTasks = tasks.filter((t) => t.status === "COMPLETED");
+
+  const renderTaskCard = (task: Task) => {
+    const isCompleted = task.status === "COMPLETED";
+    return (
+      <div
+        key={task.id}
+        className={`w-full flex items-start gap-4 p-4 rounded-xl border transition-all group ${
+          isCompleted
+            ? "bg-gray-50 border-gray-200 opacity-75 hover:opacity-100 hover:bg-gray-100"
+            : "bg-white border-gray-200 shadow-sm hover:border-indigo-300 hover:shadow-md"
+        }`}
+      >
+        <button
+          onClick={() => toggleTaskStatus(task)}
+          className="shrink-0 mt-1 text-gray-400 transition-colors cursor-pointer"
+        >
+          {isCompleted ? (
+            <CheckCircle
+              className="text-green-500 group-hover:text-green-600"
+              size={24}
+            />
+          ) : (
+            <Circle className="group-hover:text-indigo-500" size={24} />
+          )}
+        </button>
+
+        <button
+          onClick={() => toggleTaskStatus(task)}
+          className="flex-1 text-left cursor-pointer"
+        >
+          <div className="flex items-center gap-3 mb-1">
+            <p
+              className={`font-bold text-lg transition-colors ${isCompleted ? "text-gray-500 line-through" : "text-gray-900 group-hover:text-indigo-700"}`}
+            >
+              {task.title}
+            </p>
+            {!isCompleted && renderPriorityBadge(task.priority)}
+          </div>
+
+          {task.description && (
+            <p
+              className={`text-sm mb-3 ${isCompleted ? "text-gray-400" : "text-gray-600"}`}
+            >
+              {task.description}
+            </p>
+          )}
+
+          <div className="flex items-center gap-4 text-xs font-medium text-gray-500">
+            {task.due_date && (
+              <span className="flex items-center gap-1">
+                <Calendar size={14} />
+                Prazo:{" "}
+                {new Date(task.due_date).toLocaleDateString("pt-BR")}
+              </span>
+            )}
+            {task.estimated_duration && (
+              <span className="bg-gray-100 px-2 py-1 rounded">
+                ⏱ {task.estimated_duration} min
+              </span>
+            )}
+          </div>
+        </button>
+
+        <div className="flex flex-col items-center gap-2">
+          <button
+            onClick={() => openEditModal(task)}
+            className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+            title="Editar tarefa"
+          >
+            <Pencil size={18} />
+          </button>
+          <button
+            onClick={() => handleDeleteTask(task.id)}
+            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+            title="Excluir tarefa"
+          >
+            <Trash2 size={18} />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const renderSection = (title: string, list: Task[], colorClass: string) => {
+    if (list.length === 0) return null;
+    return (
+      <div className="mb-8 last:mb-0">
+        <h2 className={`text-lg font-bold mb-4 ${colorClass}`}>{title} ({list.length})</h2>
+        <div className="space-y-3">
+          {list.map(renderTaskCard)}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
@@ -226,7 +360,7 @@ export function Tasks() {
         </button>
       </div>
 
-      <div className="space-y-3">
+      <div>
         {tasks.length === 0 ? (
           <div className="bg-white p-8 rounded-xl border border-gray-100 text-center">
             <p className="text-gray-500">
@@ -234,78 +368,12 @@ export function Tasks() {
             </p>
           </div>
         ) : (
-          tasks.map((task) => {
-            const isCompleted = task.status === "COMPLETED";
-            return (
-              <div
-                key={task.id}
-                className={`w-full flex items-start gap-4 p-4 rounded-xl border transition-all group ${
-                  isCompleted
-                    ? "bg-gray-50 border-gray-200 opacity-75 hover:opacity-100 hover:bg-gray-100"
-                    : "bg-white border-gray-200 shadow-sm hover:border-indigo-300 hover:shadow-md"
-                }`}
-              >
-                <button
-                  onClick={() => toggleTaskStatus(task)}
-                  className="shrink-0 mt-1 text-gray-400 transition-colors cursor-pointer"
-                >
-                  {isCompleted ? (
-                    <CheckCircle
-                      className="text-green-500 group-hover:text-green-600"
-                      size={24}
-                    />
-                  ) : (
-                    <Circle className="group-hover:text-indigo-500" size={24} />
-                  )}
-                </button>
-
-                <button
-                  onClick={() => toggleTaskStatus(task)}
-                  className="flex-1 text-left cursor-pointer"
-                >
-                  <div className="flex items-center gap-3 mb-1">
-                    <p
-                      className={`font-bold text-lg transition-colors ${isCompleted ? "text-gray-500 line-through" : "text-gray-900 group-hover:text-indigo-700"}`}
-                    >
-                      {task.title}
-                    </p>
-                    {!isCompleted && renderPriorityBadge(task.priority)}
-                  </div>
-
-                  {task.description && (
-                    <p
-                      className={`text-sm mb-3 ${isCompleted ? "text-gray-400" : "text-gray-600"}`}
-                    >
-                      {task.description}
-                    </p>
-                  )}
-
-                  <div className="flex items-center gap-4 text-xs font-medium text-gray-500">
-                    {task.due_date && (
-                      <span className="flex items-center gap-1">
-                        <Calendar size={14} />
-                        Prazo:{" "}
-                        {new Date(task.due_date).toLocaleDateString("pt-BR")}
-                      </span>
-                    )}
-                    {task.estimated_duration && (
-                      <span className="bg-gray-100 px-2 py-1 rounded">
-                        ⏱ {task.estimated_duration} min
-                      </span>
-                    )}
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => openEditModal(task)}
-                  className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
-                  title="Editar tarefa"
-                >
-                  <Pencil size={18} />
-                </button>
-              </div>
-            );
-          })
+          <>
+            {renderSection("Atrasadas", overdueTasks, "text-red-600")}
+            {renderSection("Hoje", todayTasks, "text-indigo-600")}
+            {renderSection("Próximas", upcomingTasks, "text-gray-800")}
+            {renderSection("Concluídas", completedTasks, "text-green-600")}
+          </>
         )}
       </div>
 

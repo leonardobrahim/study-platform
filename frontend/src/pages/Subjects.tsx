@@ -10,6 +10,7 @@ import {
   Circle,
   Plus,
   Pencil,
+  Trash2,
   X,
 } from "lucide-react";
 
@@ -120,6 +121,31 @@ export function Subjects() {
           t.id === topic.id ? { ...t, status: topic.status } : t,
         ),
       );
+    }
+  }
+
+  async function handleDeleteSubject(subjectId: string) {
+    if (!confirm("Tem certeza que deseja excluir esta disciplina e todos os seus conteúdos?")) return;
+    try {
+      await api.delete(`/subjects/${subjectId}`);
+      setSubjects((prev) => prev.filter((s) => s.id !== subjectId));
+      if (expandedId === subjectId) {
+        setExpandedId(null);
+      }
+    } catch (error) {
+      console.error("Erro ao excluir disciplina", error);
+      alert("Não foi possível excluir a disciplina.");
+    }
+  }
+
+  async function handleDeleteTopic(topicId: string) {
+    if (!confirm("Tem certeza que deseja excluir este conteúdo?")) return;
+    try {
+      await api.delete(`/topics/${topicId}`);
+      setTopics((prev) => prev.filter((t) => t.id !== topicId));
+    } catch (error) {
+      console.error("Erro ao excluir conteúdo", error);
+      alert("Não foi possível excluir o conteúdo.");
     }
   }
 
@@ -316,6 +342,16 @@ export function Subjects() {
                     <Pencil size={18} />
                   </button>
                   <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteSubject(subject.id);
+                    }}
+                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                    title="Excluir disciplina"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                  <button
                     onClick={() => toggleSubject(subject.id)}
                     className="text-gray-400 cursor-pointer p-2"
                   >
@@ -391,13 +427,22 @@ export function Subjects() {
                                 </p>
                               )}
                             </button>
-                            <button
-                              onClick={() => openEditTopicModal(topic)}
-                              className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
-                              title="Editar conteúdo"
-                            >
-                              <Pencil size={16} />
-                            </button>
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => openEditTopicModal(topic)}
+                                className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                                title="Editar conteúdo"
+                              >
+                                <Pencil size={16} />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteTopic(topic.id)}
+                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                                title="Excluir conteúdo"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
                           </div>
                         );
                       })}

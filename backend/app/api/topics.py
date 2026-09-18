@@ -83,3 +83,21 @@ def update_topic(
     db.commit()
     db.refresh(topic)
     return topic
+
+@router.delete("/{topic_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_topic(
+    topic_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    topic = db.query(Topic).join(Subject).join(Semester).filter(
+        Topic.id == topic_id,
+        Semester.user_id == current_user.id
+    ).first()
+
+    if not topic:
+        raise HTTPException(status_code=404, detail="Conteúdo não encontrado.")
+
+    db.delete(topic)
+    db.commit()
+    return None

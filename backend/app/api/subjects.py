@@ -91,3 +91,21 @@ def update_subject(
     db.commit()
     db.refresh(subject)
     return subject
+
+@router.delete("/{subject_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_subject(
+    subject_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    subject = db.query(Subject).join(Semester).filter(
+        Subject.id == subject_id,
+        Semester.user_id == current_user.id
+    ).first()
+
+    if not subject:
+        raise HTTPException(status_code=404, detail="Disciplina não encontrada.")
+
+    db.delete(subject)
+    db.commit()
+    return None
