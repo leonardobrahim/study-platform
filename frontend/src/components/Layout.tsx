@@ -7,6 +7,7 @@ import {
   Timer,
   History,
   LogOut,
+  Award,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -30,6 +31,7 @@ export function Layout() {
     { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { to: "/semesters", icon: Calendar, label: "Semestres" },
     { to: "/subjects", icon: BookOpen, label: "Disciplinas" },
+    { to: "/assessments", icon: Award, label: "Avaliações" },
     { to: "/tasks", icon: CheckSquare, label: "Tarefas" },
     { to: "/timer", icon: Timer, label: "Timer" },
     { to: "/sessions", icon: History, label: "Histórico" },

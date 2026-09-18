@@ -20,3 +20,4 @@ class Topic(Base):
     subject = relationship("Subject", back_populates="topics")
     tasks = relationship("Task", back_populates="topic")
     study_sessions = relationship("StudySession", back_populates="topic")
+    assessments = relationship("Assessment", secondary="assessment_topic", back_populates="topics")
