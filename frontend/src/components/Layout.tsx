@@ -9,6 +9,7 @@ import {
   History,
   LogOut,
   Award,
+  RotateCw,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -36,6 +37,7 @@ export function Layout() {
     { to: "/assessments", icon: Award, label: "Avaliações" },
     { to: "/tasks", icon: CheckSquare, label: "Tarefas" },
     { to: "/timer", icon: Timer, label: "Timer" },
+    { to: "/reviews", icon: RotateCw, label: "Revisões" },
     { to: "/sessions", icon: History, label: "Histórico" },
   ];
 

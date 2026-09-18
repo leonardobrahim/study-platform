@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, BookOpen, Award, CheckSquare } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, BookOpen, Award, CheckSquare, RotateCw } from "lucide-react";
 import { calendarService } from "../services/calendarService";
 import type { CalendarEvent } from "../types/calendar";
 
 export function CalendarView() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // Constants
   const year = currentDate.getFullYear();
@@ -18,7 +17,6 @@ export function CalendarView() {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        setLoading(true);
         // We fetch a generous range, from beginning of month to end of month
         const start = new Date(year, month, 1);
         const end = new Date(year, month + 1, 0, 23, 59, 59);
@@ -26,8 +24,6 @@ export function CalendarView() {
         setEvents(fetchedEvents);
       } catch (error) {
         console.error("Erro ao carregar eventos do calendário:", error);
-      } finally {
-        setLoading(false);
       }
     }
     fetchEvents();
@@ -60,6 +56,7 @@ export function CalendarView() {
       case "TASK": return <CheckSquare size={12} />;
       case "SESSION": return <Clock size={12} />;
       case "ASSESSMENT": return <Award size={12} />;
+      case "REVIEW": return <RotateCw size={12} />;
       default: return <BookOpen size={12} />;
     }
   };

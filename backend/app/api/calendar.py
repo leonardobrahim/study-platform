@@ -11,6 +11,7 @@ from app.models.user import User
 from app.models.task import Task
 from app.models.study_session import StudySession
 from app.models.assessment import Assessment
+from app.models.review import Review
 from app.schemas.calendar import CalendarEvent
 
 router = APIRouter()
@@ -75,6 +76,24 @@ def get_calendar_events(
             date=assessment.date,
             subject_name=assessment.subject.name if assessment.subject else None,
             color=assessment.subject.color if assessment.subject else None
+        ))
+
+    # 4. Fetch Reviews
+    review_query = db.query(Review).filter(Review.user_id == current_user.id)
+    if start_date:
+        review_query = review_query.filter(Review.due_date >= start_date)
+    if end_date:
+        review_query = review_query.filter(Review.due_date <= end_date)
+    
+    for review in review_query.all():
+        events.append(CalendarEvent(
+            id=review.id,
+            title=f"Revisão: {review.topic.name}",
+            type="REVIEW",
+            date=review.due_date,
+            status=review.status,
+            subject_name=review.topic.subject.name if review.topic and review.topic.subject else None,
+            color=review.topic.subject.color if review.topic and review.topic.subject else None
         ))
 
     # Sort all events by date

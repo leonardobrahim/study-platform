@@ -21,3 +21,4 @@ class Topic(Base):
     tasks = relationship("Task", back_populates="topic")
     study_sessions = relationship("StudySession", back_populates="topic")
     assessments = relationship("Assessment", secondary="assessment_topic", back_populates="topics")
+    reviews = relationship("Review", back_populates="topic", cascade="all, delete-orphan")

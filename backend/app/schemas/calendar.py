@@ -6,7 +6,7 @@ from uuid import UUID
 class CalendarEvent(BaseModel):
     id: UUID
     title: str
-    type: Literal["TASK", "SESSION", "ASSESSMENT"]
+    type: Literal["TASK", "SESSION", "ASSESSMENT", "REVIEW"]
     date: datetime
     end_date: Optional[datetime] = None
     status: Optional[str] = None

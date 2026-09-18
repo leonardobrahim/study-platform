@@ -76,9 +76,35 @@ def update_topic(
     # exclude_unset=True garante que ele só pegue os campos que você enviou no JSON
     update_data = topic_update.model_dump(exclude_unset=True)
     
+    # Verifica transição de status
+    from datetime import datetime, timedelta, timezone
+    from app.models.review import Review
+    
+    status_changed_to_completed = False
+    status_changed_from_completed = False
+    
+    if "status" in update_data:
+        if update_data["status"] == "COMPLETED" and topic.status != "COMPLETED":
+            status_changed_to_completed = True
+        elif update_data["status"] != "COMPLETED" and topic.status == "COMPLETED":
+            status_changed_from_completed = True
+        
     # Atualiza dinamicamente as colunas no banco
     for key, value in update_data.items():
         setattr(topic, key, value)
+
+    if status_changed_to_completed:
+        # Remove revisões antigas (se existirem) para evitar duplicação
+        db.query(Review).filter(Review.topic_id == topic.id).delete()
+        
+        now = datetime.now(timezone.utc)
+        review1 = Review(user_id=current_user.id, topic_id=topic.id, due_date=now + timedelta(days=1), review_number=1)
+        review2 = Review(user_id=current_user.id, topic_id=topic.id, due_date=now + timedelta(days=7), review_number=2)
+        review3 = Review(user_id=current_user.id, topic_id=topic.id, due_date=now + timedelta(days=30), review_number=3)
+        db.add_all([review1, review2, review3])
+    elif status_changed_from_completed:
+        # Se desmarcou como concluído, remove as revisões pendentes desse tópico
+        db.query(Review).filter(Review.topic_id == topic.id).delete()
 
     db.commit()
     db.refresh(topic)
