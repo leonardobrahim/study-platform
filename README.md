@@ -209,6 +209,28 @@ Alguns endpoints da API incluem:
 - `/api/calendar` — calendário
 - `/api/reviews` — revisões
 
+## Deploy em produção (Nuvem)
+
+A aplicação pode ser facilmente hospedada gratuitamente utilizando:
+
+1. **Banco de Dados:** [Supabase](https://supabase.com) (PostgreSQL)
+2. **Backend API:** [Render](https://render.com) (Web Service Python)
+3. **Frontend:** [Vercel](https://vercel.com) (Vite/React)
+
+### Variáveis de ambiente em produção
+
+- **Backend (Render):**
+  - `DATABASE_URL`: String de conexão do Supabase (utilize o modo **Connection Pooling / IPv4**, porta 6543, ex: `postgresql://postgres.[ref]:[senha]@aws-0-sa-east-1.pooler.supabase.com:6543/postgres`).
+  - `SECRET_KEY`: Chave secreta segura para JWT.
+  - `ALGORITHM`: `HS256`
+  - `ACCESS_TOKEN_EXPIRE_MINUTES`: `43200`
+  - **Build Command:** `pip install -r requirements.txt`
+  - **Start Command:** `alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+
+- **Frontend (Vercel):**
+  - `VITE_API_URL`: URL da API na Render com `/api` no final (ex: `https://sua-api.onrender.com/api`).
+  - **Root Directory:** `frontend`
+
 ## Comandos úteis
 
 ### Backend
@@ -219,6 +241,7 @@ python -m venv venv
 .\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 alembic upgrade head
+python seed_data.py       # Popular dados de portfólio/teste
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
@@ -244,6 +267,12 @@ npm run build
 - Verifique se o PostgreSQL está rodando.
 - Confirme se o banco `study_platform` existe.
 - Confira se a URL no arquivo `.env` está correta.
+
+### Network is unreachable / IPv6 no Supabase (Render)
+
+- Se a Render falhar ao conectar no Supabase com `psycopg2.OperationalError: Network is unreachable`:
+  - No Supabase, clique em **Connect** e ative a opção **Use connection pooling** (porta 6543).
+  - Use o host que contém `.pooler.supabase.com` em vez da conexão direta `db.xxx.supabase.co` (que utiliza IPv6 puro não suportado pela camada gratuita da Render).
 
 ### Erro de dependências
 
