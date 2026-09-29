@@ -47,7 +47,8 @@ study-platform/
 │   │   └── schemas/
 │   ├── .env
 │   ├── requirements.txt
-│   └── alembic.ini
+│   ├── alembic.ini
+│   └── seed_data.py
 ├── frontend/
 │   ├── src/
 │   ├── package.json
@@ -56,6 +57,23 @@ study-platform/
 ├── .gitignore
 └── README.md
 ```
+
+## Conta de demonstração (Portfólio)
+
+Para testar ou demonstrar a aplicação com dados já preenchidos (semestres, disciplinas, tópicos, tarefas e sessões de estudo):
+
+- **Email:** `portfolio@teste.com`
+- **Senha:** `portfolio123`
+
+### Como popular o banco de dados (Seed)
+
+Após configurar o banco de dados e aplicar as migrações (`alembic upgrade head`), execute o script de semente na pasta `backend`:
+
+```bash
+cd backend
+python seed_data.py
+```
+*(No Windows com venv ativo: `.\venv\Scripts\python.exe seed_data.py`)*
 
 ## Requisitos
 
@@ -144,13 +162,20 @@ http://localhost:8000/docs
 cd frontend
 ```
 
-3. Instale as dependências:
+3. (Opcional) Configure a URL da API criando um arquivo `frontend/.env`:
+
+```env
+VITE_API_URL=http://127.0.0.1:8000/api
+```
+> Caso não seja informado, o padrão é `http://127.0.0.1:8000/api`.
+
+4. Instale as dependências:
 
 ```bash
 npm install
 ```
 
-4. Inicie a aplicação em modo de desenvolvimento:
+5. Inicie a aplicação em modo de desenvolvimento:
 
 ```bash
 npm run dev
