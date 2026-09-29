@@ -70,28 +70,42 @@ def get_dashboard_summary(
     total_topics_overall = 0
     completed_topics_overall = 0
 
-    for subject in active_subjects:
-        total_topics = db.query(Topic).filter(Topic.subject_id == subject.id).count()
-        completed_topics = db.query(Topic).filter(
-            Topic.subject_id == subject.id,
-            Topic.status == "COMPLETED"
-        ).count()
+    if active_subjects:
+        from sqlalchemy import case
+        subject_ids = [s.id for s in active_subjects]
+        
+        # Faz uma única consulta para contar todos os tópicos e os concluídos agrupados por disciplina
+        topics_stats = db.query(
+            Topic.subject_id,
+            func.count(Topic.id).label('total'),
+            func.sum(case((Topic.status == "COMPLETED", 1), else_=0)).label('completed')
+        ).filter(
+            Topic.subject_id.in_(subject_ids)
+        ).group_by(Topic.subject_id).all()
+        
+        # Mapeia os resultados para acesso rápido
+        stats_map = {row.subject_id: {"total": row.total, "completed": row.completed or 0} for row in topics_stats}
+        
+        for subject in active_subjects:
+            stats = stats_map.get(subject.id, {"total": 0, "completed": 0})
+            total_topics = stats["total"]
+            completed_topics = stats["completed"]
+            
+            progress = 0.0
+            if total_topics > 0:
+                progress = round((completed_topics / total_topics) * 100, 2)
 
-        progress = 0.0
-        if total_topics > 0:
-            progress = round((completed_topics / total_topics) * 100, 2)
+            total_topics_overall += total_topics
+            completed_topics_overall += completed_topics
 
-        total_topics_overall += total_topics
-        completed_topics_overall += completed_topics
-
-        subjects_progress.append(
-            SubjectProgress(
-                subject_id=subject.id,
-                name=subject.name,
-                color=subject.color,
-                progress_percentage=progress
+            subjects_progress.append(
+                SubjectProgress(
+                    subject_id=subject.id,
+                    name=subject.name,
+                    color=subject.color,
+                    progress_percentage=progress
+                )
             )
-        )
 
     # 6. Progresso Geral
     overall_progress = 0.0
