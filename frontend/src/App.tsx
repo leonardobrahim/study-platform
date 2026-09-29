@@ -8,6 +8,9 @@ import { Subjects } from "./pages/Subjects";
 import { Tasks } from "./pages/Tasks";
 import { Timer } from "./pages/Timer";
 import { Sessions } from "./pages/Sessions";
+import { Assessments } from "./pages/Assessments";
+import { CalendarView } from "./pages/CalendarView";
+import { Reviews } from "./pages/Reviews";
 
 export default function App() {
   return (
@@ -18,9 +21,12 @@ export default function App() {
 
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/calendar" element={<CalendarView />} />
           <Route path="/semesters" element={<Semesters />} />
           <Route path="/subjects" element={<Subjects />} />
           <Route path="/tasks" element={<Tasks />} />
+          <Route path="/assessments" element={<Assessments />} />
+          <Route path="/reviews" element={<Reviews />} />
           <Route path="/timer" element={<Timer />} />
           <Route path="/sessions" element={<Sessions />} />
         </Route>

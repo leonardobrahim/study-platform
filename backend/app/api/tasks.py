@@ -104,3 +104,16 @@ def update_task(
     db.commit()
     db.refresh(task)
     return task
+
+@router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_task(
+    task_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    task = db.query(Task).filter(Task.id == task_id, Task.user_id == current_user.id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Tarefa não encontrada.")
+    db.delete(task)
+    db.commit()
+    return None

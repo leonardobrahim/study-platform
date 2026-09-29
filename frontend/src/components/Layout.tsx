@@ -1,12 +1,15 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
+  CalendarDays,
   Calendar,
   BookOpen,
   CheckSquare,
   Timer,
   History,
   LogOut,
+  Award,
+  RotateCw,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -28,10 +31,13 @@ export function Layout() {
 
   const navItems = [
     { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { to: "/calendar", icon: CalendarDays, label: "Calendário" },
     { to: "/semesters", icon: Calendar, label: "Semestres" },
     { to: "/subjects", icon: BookOpen, label: "Disciplinas" },
+    { to: "/assessments", icon: Award, label: "Avaliações" },
     { to: "/tasks", icon: CheckSquare, label: "Tarefas" },
     { to: "/timer", icon: Timer, label: "Timer" },
+    { to: "/reviews", icon: RotateCw, label: "Revisões" },
     { to: "/sessions", icon: History, label: "Histórico" },
   ];
 
