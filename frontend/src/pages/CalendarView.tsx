@@ -64,7 +64,7 @@ export function CalendarView() {
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-12">
       {/* Header */}
-      <div className="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 gap-4">
         <div className="flex items-center gap-3">
           <div className="bg-indigo-100 p-3 rounded-lg text-indigo-600">
             <CalendarIcon size={24} />
@@ -74,7 +74,7 @@ export function CalendarView() {
             <p className="text-gray-500">Acompanhe suas Tarefas, Provas e Sessões.</p>
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-2 md:gap-4 w-full md:w-auto justify-between md:justify-end">
           <button 
             onClick={handleToday}
             className="px-4 py-2 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition"
@@ -96,18 +96,19 @@ export function CalendarView() {
       </div>
 
       {/* Calendar Grid */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        {/* Days of week header */}
-        <div className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
-          {weekDays.map(day => (
-            <div key={day} className="py-3 text-center text-sm font-semibold text-gray-600">
-              {day}
-            </div>
-          ))}
-        </div>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
+        <div className="min-w-[700px]">
+          {/* Days of week header */}
+          <div className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
+            {weekDays.map(day => (
+              <div key={day} className="py-3 text-center text-sm font-semibold text-gray-600">
+                {day}
+              </div>
+            ))}
+          </div>
 
-        {/* Calendar body */}
-        <div className="grid grid-cols-7 min-h-[600px]">
+          {/* Calendar body */}
+          <div className="grid grid-cols-7 min-h-[600px]">
           {blanksArray.map(blank => (
             <div key={`blank-${blank}`} className="border-r border-b border-gray-100 bg-gray-50/50 p-2 min-h-[120px]" />
           ))}
@@ -158,6 +159,7 @@ export function CalendarView() {
               </div>
             );
           })}
+          </div>
         </div>
       </div>
     </div>
