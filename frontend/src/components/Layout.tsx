@@ -71,17 +71,25 @@ export function Layout() {
       {/* Sidebar (Menu Lateral) */}
       <aside 
         className={`${
-          isMobileMenuOpen ? "flex" : "hidden"
-        } md:flex flex-col absolute md:static z-20 w-full md:w-64 h-[calc(100vh-73px)] md:h-full bg-white border-r border-gray-200 transition-all`}
+          isMobileMenuOpen ? "fixed inset-0 z-50 flex" : "hidden"
+        } md:static md:z-auto md:flex flex-col w-full md:w-64 h-full bg-white border-r border-gray-200 transition-all`}
       >
-        <div className="p-6 mb-4 flex items-center gap-3">
-          <div className="bg-indigo-600 p-2 rounded-lg">
-            <BookOpen className="text-white w-6 h-6" />
+        <div className="p-4 md:p-6 mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-indigo-600 p-2 rounded-lg">
+              <BookOpen className="text-white w-6 h-6" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">StudyApp</h2>
           </div>
-          <h2 className="text-xl font-bold text-gray-900">StudyApp</h2>
+          <button 
+            onClick={() => setIsMobileMenuOpen(false)} 
+            className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <X size={24} />
+          </button>
         </div>
 
-        <nav className="flex-1 px-4 space-y-2">
+        <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
