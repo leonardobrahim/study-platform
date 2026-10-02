@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   CalendarDays,
@@ -10,11 +10,20 @@ import {
   LogOut,
   Award,
   RotateCw,
+  Menu,
+  X,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export function Layout() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Fecha o menu mobile quando mudar de rota
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   // Proteção extra: se não tiver token, joga pro login
   useEffect(() => {
@@ -42,9 +51,29 @@ export function Layout() {
   ];
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex flex-col md:flex-row h-screen bg-gray-50 overflow-hidden">
+      {/* Mobile Top Bar */}
+      <div className="md:hidden flex items-center justify-between p-4 bg-white border-b border-gray-200 shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="bg-indigo-600 p-2 rounded-lg">
+            <BookOpen className="text-white w-5 h-5" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900">StudyApp</h2>
+        </div>
+        <button 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
       {/* Sidebar (Menu Lateral) */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
+      <aside 
+        className={`${
+          isMobileMenuOpen ? "flex" : "hidden"
+        } md:flex flex-col absolute md:static z-20 w-full md:w-64 h-[calc(100vh-73px)] md:h-full bg-white border-r border-gray-200 transition-all`}
+      >
         <div className="p-6 mb-4 flex items-center gap-3">
           <div className="bg-indigo-600 p-2 rounded-lg">
             <BookOpen className="text-white w-6 h-6" />
@@ -72,7 +101,7 @@ export function Layout() {
         </nav>
 
         {/* Botão de Sair no rodapé do menu */}
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-gray-200 pb-safe">
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors w-full font-medium"
@@ -84,7 +113,7 @@ export function Layout() {
       </aside>
 
       {/* Área Principal onde as telas (Dashboard, Tarefas, etc) vão aparecer */}
-      <main className="flex-1 overflow-y-auto p-8">
+      <main className="flex-1 overflow-y-auto p-4 md:p-8">
         <Outlet />
       </main>
     </div>

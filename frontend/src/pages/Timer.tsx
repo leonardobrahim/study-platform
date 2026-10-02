@@ -170,14 +170,14 @@ export function Timer() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Timer de Estudos</h1>
           <p className="text-gray-500">
             Concentre-se, acompanhe seu tempo e evolua.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
           <button
             onClick={() => setShowManualModal(true)}
             className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors cursor-pointer border border-indigo-100"
@@ -211,11 +211,11 @@ export function Timer() {
           </select>
         </div>
 
-        <div className="text-7xl md:text-9xl font-bold text-gray-800 font-mono tracking-wider mb-12 select-none">
+        <div className="text-6xl sm:text-7xl md:text-9xl font-bold text-gray-800 font-mono tracking-wider mb-8 sm:mb-12 select-none">
           {formatTime(time)}
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
           <button
             onClick={toggleTimer}
             className={`flex items-center gap-2 px-8 py-4 rounded-full font-bold text-lg transition-all cursor-pointer ${
@@ -226,11 +226,11 @@ export function Timer() {
           >
             {isRunning ? (
               <>
-                <Pause size={24} /> Pausar
+                <Pause size={24} className="shrink-0" /> Pausar
               </>
             ) : (
               <>
-                <Play size={24} /> {time > 0 ? "Continuar" : "Iniciar"}
+                <Play size={24} className="shrink-0" /> {time > 0 ? "Continuar" : "Iniciar"}
               </>
             )}
           </button>
@@ -238,9 +238,9 @@ export function Timer() {
           {time > 0 && (
             <button
               onClick={handleFinish}
-              className="flex items-center gap-2 px-8 py-4 rounded-full font-bold text-lg bg-green-100 text-green-700 hover:bg-green-200 transition-all cursor-pointer"
+              className="flex items-center justify-center gap-2 px-8 py-4 rounded-full font-bold text-lg bg-green-100 text-green-700 hover:bg-green-200 transition-all cursor-pointer w-full sm:w-auto"
             >
-              <Square size={24} /> Finalizar
+              <Square size={24} className="shrink-0" /> Finalizar
             </button>
           )}
         </div>

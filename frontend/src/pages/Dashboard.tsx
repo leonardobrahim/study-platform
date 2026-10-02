@@ -141,7 +141,7 @@ export function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-1 md:grid-cols-2 gap-6">
         {/* Gráfico de Pizza - Tempo por Disciplina */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
           <div className="flex justify-between items-center mb-2">
