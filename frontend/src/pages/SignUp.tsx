@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { api } from "../services/api";
+import type { FormEvent } from "react";
+import axios from "axios";
 import { BookOpen } from "lucide-react";
-import { useNavigate, Link } from "react-router-dom";
+import { Navigate, useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 export function SignUp() {
+  const { isAuthenticated, signUp } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,7 +15,11 @@ export function SignUp() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  const handleSignUp = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -29,23 +36,12 @@ export function SignUp() {
     setLoading(true);
 
     try {
-      // 1. Cria a conta
-      await api.post("/auth/register", { name, email, password });
-
-      // 2. Loga automaticamente com as mesmas credenciais
-      const formData = new URLSearchParams();
-      formData.append("username", email);
-      formData.append("password", password);
-      const loginResponse = await api.post("/auth/login", formData);
-
-      localStorage.setItem(
-        "@StudyPlatform:token",
-        loginResponse.data.access_token,
-      );
-
+      await signUp(name, email, password);
       navigate("/dashboard");
-    } catch (err: any) {
-      const detail = err.response?.data?.detail;
+    } catch (err: unknown) {
+      const detail = axios.isAxiosError(err)
+        ? err.response?.data?.detail
+        : null;
       setError(
         typeof detail === "string"
           ? detail
@@ -57,8 +53,8 @@ export function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-100">
         <div className="flex flex-col items-center justify-center mb-8">
           <div className="bg-indigo-100 p-3 rounded-full mb-4">
             <BookOpen className="w-8 h-8 text-indigo-600" />
@@ -135,7 +131,7 @@ export function SignUp() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-indigo-600 text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {loading ? "Criando conta..." : "Criar conta"}
           </button>
