@@ -1,27 +1,29 @@
-from pydantic import BaseModel, ConfigDict
-from uuid import UUID
 from datetime import datetime
-from typing import Optional
+from typing import Literal, Optional
+from uuid import UUID
+from pydantic import BaseModel, ConfigDict, Field
 
-# Base compartilhada
+SemesterStatus = Literal["ACTIVE", "ARCHIVED"]
+
+
 class SemesterBase(BaseModel):
-    name: str
-    year: int
-    period: int
-    status: Optional[str] = "ACTIVE" # ACTIVE ou ARCHIVED
+    name: str = Field(..., min_length=1, max_length=120)
+    year: int = Field(..., ge=2000, le=2100)
+    period: int = Field(..., ge=1, le=4)
+    status: SemesterStatus = "ACTIVE"
 
-# O que o usuário envia para criar (herda a Base)
+
 class SemesterCreate(SemesterBase):
     pass
 
-# O que o usuário envia para atualizar (todos os campos opcionais)
-class SemesterUpdate(BaseModel):
-    name: Optional[str] = None
-    year: Optional[int] = None
-    period: Optional[int] = None
-    status: Optional[str] = None
 
-# O que a API devolve
+class SemesterUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=120)
+    year: Optional[int] = Field(None, ge=2000, le=2100)
+    period: Optional[int] = Field(None, ge=1, le=4)
+    status: Optional[SemesterStatus] = None
+
+
 class SemesterResponse(SemesterBase):
     id: UUID
     user_id: UUID

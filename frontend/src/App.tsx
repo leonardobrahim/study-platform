@@ -1,8 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthProvider";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { Layout } from "./components/Layout";
 import { Login } from "./pages/Login";
 import { SignUp } from "./pages/SignUp";
 import { Dashboard } from "./pages/Dashboard";
-import { Layout } from "./components/Layout";
 import { Semesters } from "./pages/Semesters";
 import { Subjects } from "./pages/Subjects";
 import { Tasks } from "./pages/Tasks";
@@ -14,25 +16,29 @@ import { Reviews } from "./pages/Reviews";
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
 
-        <Route element={<Layout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/calendar" element={<CalendarView />} />
-          <Route path="/semesters" element={<Semesters />} />
-          <Route path="/subjects" element={<Subjects />} />
-          <Route path="/tasks" element={<Tasks />} />
-          <Route path="/assessments" element={<Assessments />} />
-          <Route path="/reviews" element={<Reviews />} />
-          <Route path="/timer" element={<Timer />} />
-          <Route path="/sessions" element={<Sessions />} />
-        </Route>
+          <Route element={<ProtectedRoute />}>
+            <Route element={<Layout />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/calendar" element={<CalendarView />} />
+              <Route path="/semesters" element={<Semesters />} />
+              <Route path="/subjects" element={<Subjects />} />
+              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/assessments" element={<Assessments />} />
+              <Route path="/reviews" element={<Reviews />} />
+              <Route path="/timer" element={<Timer />} />
+              <Route path="/sessions" element={<Sessions />} />
+            </Route>
+          </Route>
 
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </BrowserRouter>
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
