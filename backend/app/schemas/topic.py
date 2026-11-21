@@ -1,28 +1,31 @@
-from pydantic import BaseModel, ConfigDict
-from uuid import UUID
 from datetime import datetime
-from typing import Optional
+from typing import Literal, Optional
+from uuid import UUID
+from pydantic import BaseModel, ConfigDict, Field
 
-# Base compartilhada
+TopicDifficulty = Literal["EASY", "MEDIUM", "HARD"]
+TopicStatus = Literal["NOT_STARTED", "IN_PROGRESS", "COMPLETED"]
+
+
 class TopicBase(BaseModel):
-    name: str
+    name: str = Field(..., min_length=1, max_length=200)
     subject_id: UUID
     description: Optional[str] = None
-    difficulty: Optional[str] = "MEDIUM" # EASY, MEDIUM, HARD
-    status: Optional[str] = "NOT_STARTED" # NOT_STARTED, IN_PROGRESS, COMPLETED
+    difficulty: TopicDifficulty = "MEDIUM"
+    status: TopicStatus = "NOT_STARTED"
 
-# Usado para criar
+
 class TopicCreate(TopicBase):
     pass
 
-# Usado para atualizar (todos os campos são opcionais, atualiza só o que enviar)
-class TopicUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    difficulty: Optional[str] = None
-    status: Optional[str] = None
 
-# O que a API devolve
+class TopicUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=200)
+    description: Optional[str] = None
+    difficulty: Optional[TopicDifficulty] = None
+    status: Optional[TopicStatus] = None
+
+
 class TopicResponse(TopicBase):
     id: UUID
     created_at: datetime

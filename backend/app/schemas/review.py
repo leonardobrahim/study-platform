@@ -1,26 +1,32 @@
-from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
+from typing import Literal, Optional
 from uuid import UUID
+from pydantic import BaseModel, ConfigDict
+
+ReviewStatus = Literal["PENDING", "COMPLETED"]
+
 
 class ReviewBase(BaseModel):
     pass
+
 
 class ReviewCreate(ReviewBase):
     topic_id: UUID
     due_date: datetime
     review_number: int
 
+
 class ReviewUpdate(BaseModel):
-    status: Optional[str] = None
+    status: Optional[ReviewStatus] = None
     completed_at: Optional[datetime] = None
+
 
 class ReviewTopicResponse(BaseModel):
     id: UUID
     name: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
+
 
 class ReviewResponse(ReviewBase):
     id: UUID
@@ -33,5 +39,4 @@ class ReviewResponse(ReviewBase):
     review_number: int
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

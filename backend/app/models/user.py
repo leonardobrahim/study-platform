@@ -20,3 +20,4 @@ class User(Base):
     tasks = relationship("Task", back_populates="user", cascade="all, delete-orphan")
     study_sessions = relationship("StudySession", back_populates="user", cascade="all, delete-orphan")
     reviews = relationship("Review", back_populates="user", cascade="all, delete-orphan")
+    assessments = relationship("Assessment", back_populates="user", cascade="all, delete-orphan")

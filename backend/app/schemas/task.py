@@ -1,30 +1,37 @@
-from pydantic import BaseModel, ConfigDict
-from uuid import UUID
 from datetime import datetime
-from typing import Optional
+from typing import Literal, Optional
+from uuid import UUID
+from pydantic import BaseModel, ConfigDict, Field
+
+TaskStatus = Literal["PENDING", "COMPLETED"]
+TaskPriority = Literal["LOW", "MEDIUM", "HIGH"]
+
 
 class TaskBase(BaseModel):
-    title: str
+    title: str = Field(..., min_length=1, max_length=200)
     description: Optional[str] = None
     due_date: Optional[datetime] = None
-    estimated_duration: Optional[int] = None # em minutos
-    status: Optional[str] = "PENDING" # PENDING, COMPLETED
-    priority: Optional[str] = "MEDIUM" # LOW, MEDIUM, HIGH
+    estimated_duration: Optional[int] = Field(None, ge=1)
+    status: TaskStatus = "PENDING"
+    priority: TaskPriority = "MEDIUM"
     subject_id: Optional[UUID] = None
     topic_id: Optional[UUID] = None
+
 
 class TaskCreate(TaskBase):
     pass
 
+
 class TaskUpdate(BaseModel):
-    title: Optional[str] = None
+    title: Optional[str] = Field(None, min_length=1, max_length=200)
     description: Optional[str] = None
     due_date: Optional[datetime] = None
-    estimated_duration: Optional[int] = None
-    status: Optional[str] = None
-    priority: Optional[str] = None
+    estimated_duration: Optional[int] = Field(None, ge=1)
+    status: Optional[TaskStatus] = None
+    priority: Optional[TaskPriority] = None
     subject_id: Optional[UUID] = None
     topic_id: Optional[UUID] = None
+
 
 class TaskResponse(TaskBase):
     id: UUID
