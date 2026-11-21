@@ -220,10 +220,21 @@ export function Dashboard() {
 
           <div className="h-60">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <BarChart data={barData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 12}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 12}} />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{fill: '#9ca3af', fontSize: 12}}
+                  tickFormatter={(value) => {
+                    const hours = Math.floor(value / 60);
+                    const mins = value % 60;
+                    if (hours > 0 && mins > 0) return `${hours}h ${mins}m`;
+                    if (hours > 0) return `${hours}h`;
+                    return `${mins}m`;
+                  }}
+                />
                 <RechartsTooltip 
                   cursor={{fill: '#f3f4f6'}}
                   formatter={(value: any) => [formatTime(Number(value) * 60), 'Tempo Estudado']}
